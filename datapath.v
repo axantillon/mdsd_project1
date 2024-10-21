@@ -19,7 +19,6 @@ module datapath(
     wire [0:7] regA, regB, aluZ;
 
     assign replaceData = (muxSel) ? inputData : aluZ;
-    
     and clk_write(clk_writeEnable, clk, writeEnable);
 
     register_file regFile(clk_writeEnable, replaceData, dstSel, A_sel, B_sel, regA, regB);
