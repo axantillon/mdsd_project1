@@ -6,6 +6,14 @@
     Testbench
 */
 
-module testbench();
+module alu_testbench();
+
+endmodule
+
+module register_testbench();
+
+endmodule
+
+module datapath_testbench();
 
 endmodule

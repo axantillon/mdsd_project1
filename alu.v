@@ -6,8 +6,14 @@
     AlU module
 */
 
-
-module custom_alu(input OP[0:3], input A[0:7], input B[0:7], output Z[0:7]);
+/*
+    ALU Module
+    OP: Operation code
+    A: First operand
+    B: Second operand
+    Z: Result
+*/
+module custom_alu(input [3:0] OP, input [7:0] A, input [7:0] B, output reg [7:0] Z);
 
     always @(OP, A, B) begin
         case (OP)
@@ -27,7 +33,7 @@ module custom_alu(input OP[0:3], input A[0:7], input B[0:7], output Z[0:7]);
             4'b0100: Z = A + B;
 
             // Negate A to Twos complement
-            4'b0101: Z = ~A + 1; //TODO: Check if this is correct
+            4'b0101: Z = ~A + 1;
 
             // Bitwise AND
             4'b0110: Z = A & B;

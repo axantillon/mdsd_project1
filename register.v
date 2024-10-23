@@ -6,29 +6,37 @@
     Register module
 */
 
+/*
+    Register File Module
+    Inputs:
+        clk: Clock signal
+        replaceData: Data to replace in the register
+        replaceSel: Selector for the register to replace
+        A_sel: Selector for register A
+        B_sel: Selector for register B
+    Outputs:
+        A: Value passed to A
+        B: Value passed to B
+*/
 
 module register_file(
     input clk, 
-    input [0:7] replaceData, 
-    input [0:3] replaceSel, 
-    input [0:3] A_sel, 
-    input [0:3] B_sel, 
-    output [0:7] A, 
-    output [0:7] B
+    input [7:0] replaceData, 
+    input [3:0] replaceSel, 
+    input [3:0] A_sel, 
+    input [3:0] B_sel, 
+    output [7:0] A, 
+    output [7:0] B
 );
 
-    reg [0:7] regs[0:15];
+    reg [7:0] regs[15:0];
 
     always @(posedge clk) begin
         regs[replaceSel] <= replaceData;
     end
 
-    always @(A_sel) begin
-        A <= regs[A_sel];
-    end
+    assign A = regs[A_sel];
+    assign B = regs[B_sel];
 
-    always @(B_sel) begin
-        B <= regs[B_sel];
-    end
 
 endmodule
