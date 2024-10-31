@@ -4,7 +4,7 @@
 
 `timescale 1ns / 1ns
 
-module register_testbench();
+module testbench();
 
 //Inputs
     reg clk;
