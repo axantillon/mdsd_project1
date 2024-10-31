@@ -1,6 +1,5 @@
 //Register Testbench 
 
-// hello world
 
 `timescale 1ns / 1ns
 
@@ -72,7 +71,7 @@ module testbench();
     end
 
     initial begin
-		$monitor("t=%3d clk=%b replaceSel=%b, A_sel=%b, B_sel=%b, replaceData=%b, A=&b, B=%b,", $time, clk, replaceSel, A_sel, B_sel, replaceData, A, B);
+		$monitor("t=%3d clk=%b replaceSel=%b A_sel=%b B_sel=%b replaceData=%b A=%b B=%b", $time, clk, replaceSel, A_sel, B_sel, replaceData, A, B);
 		$dumpfile("registertstb.vcd");
 		$dumpvars(0, testbench);
 	end
