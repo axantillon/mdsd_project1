@@ -27,9 +27,10 @@ module testbench();
 
     //Stimulus Waveform
 
-    always begin
+   // Clock Generation
+    initial begin
         clk = 0;
-        #5 clk = ~clk; //Clock-Signal
+        forever #5 clk = ~clk; // Toggle `clk` every 5 time units
     end
 
     //Test stimulus
