@@ -7,5 +7,9 @@ module custom_alu_tb;
     wire[7:0] Z;
     
     custom_alu uut (
-        
-    )
+        .OP(OP),
+        .A(A),
+        .B(B),
+        .Z(Z),
+    );
+    
