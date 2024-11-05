@@ -75,7 +75,7 @@ module testbench();
 
         // Select register 3 for output A and register 1 for output B
         A_sel = 4'b1111;
-        B_sel = 4'b0001;
+        B_sel = 4'b0010;
         #10;
         $display("A = %b, B = %b", A, B);
 
