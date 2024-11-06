@@ -13,3 +13,11 @@ module custom_alu_tb;
         .Z(Z),
     );
     
+initial begin
+    
+    $monitor("OP: %b | A: %b | B: %b | Z: %b", OP, A, B, Z);
+
+    OP = 4'b0000; A = 8'b0; B = 8'b0;
+    #10;
+
+    
