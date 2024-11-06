@@ -13,7 +13,7 @@
     B: Second operand
     Z: Result
 */
-module custom_alu(input [3:0] OP, input [7:0] A, input [7:0] B, output reg [7:0] Z);
+module alu(input [3:0] OP, input [7:0] A, input [7:0] B, output reg [7:0] Z);
 
     always @(OP, A, B) begin
         case (OP)
@@ -42,10 +42,20 @@ module custom_alu(input [3:0] OP, input [7:0] A, input [7:0] B, output reg [7:0]
             4'b0111: Z = A | B;
 
             // Equals
-            4'b1000: Z = A == B;
+            4'b1000: begin
+                if (A == B)
+                    Z = 8'b00000001;
+                else
+                    Z = 8'b00000000;
+            end
 
             // Greater than
-            4'b1001: Z = A > B;
+            4'b1001: begin
+                if (A > B)
+                    Z = 8'b00000001;
+                else
+                    Z = 8'b00000000;
+            end
 
             default: Z = 8'b00000000;
         endcase

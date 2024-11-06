@@ -1,0 +1,11 @@
+# VCD files
+*.vcd
+
+# VVP files
+*.vvp
+
+# VCD dump files
+*.dump
+
+# VCD dump variables
+*.vcdvars
