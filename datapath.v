@@ -139,7 +139,7 @@ module datapath_testbench();
         OP_Sel = 4'b0101;  // Two's complement
         A_sel = 4'b0010;   // Register 2 contains 8
         dstSel = 4'b1011;  // Store negated value in register 11
-        #20;
+        #10;
         $display("Register 11 (should be -8): %d", uut.regFile.regs[11]);
 
         OP_Sel = 4'b0100;  // ADD operation
@@ -188,6 +188,7 @@ module datapath_testbench();
 
     initial begin
         $dumpfile("datapath.vcd");
+        $dumpvars(0, datapath_testbench);
     end
 
 endmodule
