@@ -22,28 +22,34 @@
 */
 
 module register_file(
-    input clk, 
-    input [7:0] replaceData, 
-    input [3:0] replaceSel, 
-    input [3:0] A_sel, 
+    input clk,
+    input rst,
+    input writeEnable,
+    input [7:0] replaceData,
+    input [3:0] replaceSel,
+    input [3:0] A_sel,
     input [3:0] B_sel,
-    input writeEnable, 
-    output [7:0] A, 
+    output [7:0] A,
     output [7:0] B,
     output [7:0] R15_out
 );
 
     reg [7:0] regs[15:0];
+    integer i;
 
     initial begin
-        integer i;
         for (i = 0; i < 16; i = i + 1) begin
             regs[i] = 8'b0;
         end
     end
 
-    always @(posedge clk) begin
-        if (writeEnable)
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            for (i = 0; i < 16; i = i + 1) begin
+                regs[i] <= 8'b0;
+            end
+        end
+        else if (writeEnable)
             regs[replaceSel] <= replaceData;
     end
 

@@ -4,6 +4,7 @@ module instructionDecoder (
     input wire [1:0] programSelect,    // Selects which program to execute
     input wire clk,                    // Clock signal
     input wire rst,                    // Reset signal, sets PC to 0
+    input wire [7:0] extInputDataSW,     // Add this new input
     
     // Output control signals
     output reg [7:0] instructionAddress,  // Program Counter - Address of next instruction
@@ -15,7 +16,8 @@ module instructionDecoder (
     output reg muxASelect,                // Selects between immediate value (1) and register A value (0)
     output reg [3:0] aluOpCode,          // Operation code for ALU
     output reg writeEnable,               // Enables writing to register file when high
-    output reg halt                      // Halts the program when high
+    output reg halt,                     // Halts the program when high
+    output reg [7:0] selectedInputData   // Add this new output
 );
 
     // Program Counter
@@ -45,26 +47,22 @@ module instructionDecoder (
         aluOpCode = 4'b0000;             // Default: pass A
         halt = 1'b0;                     // Default: continue execution
 
+        // Form 8-bit immediate value from instruction operands
+        selectedInputData = {instruction[7:4], instruction[3:0]};  // Default to immediate value
+
         case(instruction[15:12])  // OpCode
             4'b0000: begin  // Set to Constant
-                // Dst Reg Idx = [11:8]
-                // Value = {[7:4], [3:0]} (8-bit immediate)
                 writeSourceSelect = 1'b1;  // Select immediate value
                 muxBSelect = 1'b1;        // Use immediate value from instruction
                 // Value is formed by concatenating Operand 2 and 3
             end
             
             4'b0001: begin  // Load External
-                // Dst Reg Idx = [11:8]
-                // Other bits unused
                 writeSourceSelect = 1'b1;  // Select external input
-                // No need for mux selects as we're using external input
+                selectedInputData = extInputDataSW;
             end
             
             4'b0010: begin  // Copy
-                // Dst Reg Idx = [11:8]
-                // Src Reg Idx = [7:4]
-                // Other bits unused
                 aluOpCode = 4'b0001;  // Pass B through ALU
                 // bAddress already set to source register index
             end
@@ -78,36 +76,26 @@ module instructionDecoder (
             end
             
             4'b0100: begin  // Add
-                // Dst Reg Idx = [11:8]
-                // Src Reg Idx = [7:4]
                 aluOpCode = 4'b0010;  // Add operation
                 // Both source registers are used for operation
             end
             
             4'b0101: begin  // Negate
-                // Dst Reg Idx = [11:8]
-                // Src Reg Idx = [7:4]
                 aluOpCode = 4'b0011;  // Negate operation
                 // Only source register B is used
             end
             
             4'b0110: begin  // AND
-                // Dst Reg Idx = [11:8]
-                // Src Reg Idx = [7:4]
                 aluOpCode = 4'b0100;  // AND operation
                 // Both source registers are used
             end
             
             4'b0111: begin  // OR
-                // Dst Reg Idx = [11:8]
-                // Src Reg Idx = [7:4]
                 aluOpCode = 4'b0101;  // OR operation
                 // Both source registers are used
             end
             
             4'b1000: begin  // Shift Left
-                // Dst Reg Idx = [11:8]
-                // Src Reg Idx = [7:4]
                 // Value = [3:0] (shift amount)
                 aluOpCode = 4'b0110;  // Shift left operation
                 muxBSelect = 1'b1;    // Use immediate value for shift amount
@@ -115,8 +103,6 @@ module instructionDecoder (
             end
             
             4'b1001: begin  // Shift Right
-                // Dst Reg Idx = [11:8]
-                // Src Reg Idx = [7:4]
                 // Value = [3:0] (shift amount)
                 aluOpCode = 4'b0111;  // Shift right operation
                 muxBSelect = 1'b1;    // Use immediate value for shift amount
@@ -124,15 +110,11 @@ module instructionDecoder (
             end
             
             4'b1010: begin  // Equals
-                // Dst Reg Idx = [11:8]
-                // Src Reg Idx = [7:4]
                 aluOpCode = 4'b1000;  // Equals comparison
                 // Result will be 1 if equal, 0 if not
             end
             
             4'b1011: begin  // Greater Than
-                // Dst Reg Idx = [11:8]
-                // Src Reg Idx = [7:4]
                 aluOpCode = 4'b1001;  // Greater than comparison
                 // Result will be 1 if A > B, 0 if not
             end

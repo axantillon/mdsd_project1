@@ -24,6 +24,7 @@
 module datapath(
     // Input control signals
     input clk,                    // Clock signal
+    input rst,                    // Reset signal
     input writeEnable,           // Enables writing to register file when high
     input writeSourceSelect,     // Selects between extInputData (1) and ALU output (0) for register writes
     input muxBSelect,            // Selects between immediate value (1) and register B value (0)
@@ -45,18 +46,20 @@ module datapath(
     wire [7:0] regB;            // Value read from register B
     wire [7:0] aluZ;            // Result from ALU operation
     wire [7:0] replaceData;     // Data to be written to register file
-    wire [3:0] aluA;            // A input to ALU
+    wire [7:0] aluA;            // A input to ALU
     wire [7:0] aluB;            // B input to ALU
 
     // Select data source for register writes
     assign replaceData = (writeSourceSelect) ? extInputData : aluZ;
     
     // Select A input for ALU
-    assign aluA = muxASelect ? extInputData : regA;  
+    assign aluA = muxASelect ? extInputData : regA;
     // Select B input for ALU
     assign aluB = muxBSelect ? extInputData : regB;
+
     register_file regFile(
         .clk(clk), 
+        .rst(rst), 
         .replaceData(replaceData), 
         .replaceSel(destAddress), 
         .A_sel(aAddress), 
