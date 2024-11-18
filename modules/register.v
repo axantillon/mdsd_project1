@@ -39,14 +39,14 @@ module register_file(
 
     initial begin
         for (i = 0; i < 16; i = i + 1) begin
-            regs[i] = 8'b0;
+            regs[i] = 8'b11110000;
         end
     end
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             for (i = 0; i < 16; i = i + 1) begin
-                regs[i] <= 8'b0;
+                regs[i] <= 8'b11110000;
             end
         end
         else if (writeEnable)

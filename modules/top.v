@@ -80,8 +80,10 @@ module top (
     );
 
     // 7-segment display decoder
+    // Can only display lower 4 bits of R15
+    // TODO: Expand to display hex up to 8 bits or use 2 7-segment displays to display two digit decimals
     bin_to_hex_7seg display_decoder(
-        .in(R15_value[3:0]),  // Display lower 4 bits of R15
+        .in(R15_value),
         .out(R15_segDisplay)
     );
 
