@@ -1,6 +1,6 @@
 module instructionMemory (
     input wire [7:0] address,
-    input wire [1:0] programSelect,
+    input wire [7:0] programSelect,
     output wire [15:0] instruction
 );
 
@@ -119,10 +119,24 @@ module instructionMemory (
         fourthProgram[17] = 16'b1110_0000_0000_0000;
     end
 
+    // Modified program selection logic with priority encoding
+    wire [7:0] effectiveProgramSelect;
+    
+    // Priority encoder - select lowest numbered active switch
+    assign effectiveProgramSelect[0] = programSelect[0];
+    assign effectiveProgramSelect[1] = programSelect[1] & ~programSelect[0];
+    assign effectiveProgramSelect[2] = programSelect[2] & ~programSelect[1] & ~programSelect[0];
+    assign effectiveProgramSelect[3] = programSelect[3] & ~programSelect[2] & ~programSelect[1] & ~programSelect[0];
+    assign effectiveProgramSelect[4] = programSelect[4] & ~programSelect[3] & ~programSelect[2] & ~programSelect[1] & ~programSelect[0];
+    assign effectiveProgramSelect[5] = programSelect[5] & ~programSelect[4] & ~programSelect[3] & ~programSelect[2] & ~programSelect[1] & ~programSelect[0];
+    assign effectiveProgramSelect[6] = programSelect[6] & ~programSelect[5] & ~programSelect[4] & ~programSelect[3] & ~programSelect[2] & ~programSelect[1] & ~programSelect[0];
+    assign effectiveProgramSelect[7] = programSelect[7] & ~programSelect[6] & ~programSelect[5] & ~programSelect[4] & ~programSelect[3] & ~programSelect[2] & ~programSelect[1] & ~programSelect[0];
+    
+
     assign instruction = 
-        programSelect == 2'b00 ? sumIntegersProgram[address] :
-        programSelect == 2'b01 ? squareOfNProgram[address] :
-        programSelect == 2'b10 ? thirdProgram[address] :
-        programSelect == 2'b11 ? fourthProgram[address] : 16'b0;
+        effectiveProgramSelect[0] ? sumIntegersProgram[address] :
+        effectiveProgramSelect[1] ? squareOfNProgram[address] :
+        effectiveProgramSelect[2] ? thirdProgram[address] :
+        effectiveProgramSelect[3] ? fourthProgram[address] : 16'b0;
 
 endmodule

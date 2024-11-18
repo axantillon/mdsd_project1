@@ -1,7 +1,7 @@
 module top (
     input wire clk,
     input wire rst_btn,
-    input wire [1:0] programSelect,
+    input wire [7:0] programSelect,
     input wire [7:0] extInputDataSW,
     output wire [6:0] R15_segDisplay,
     output wire [3:0] R15_anDisplay
@@ -47,7 +47,6 @@ module top (
     // Instruction Decoder
     instructionDecoder decoder(
         .instruction(instruction),
-        .programSelect(programSelect),
         .clk(divided_clk),
         .rst(rst_debounced),
         .instructionAddress(instructionAddress),

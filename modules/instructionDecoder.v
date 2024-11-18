@@ -1,10 +1,9 @@
 module instructionDecoder (
     // Input signals
     input wire [15:0] instruction,     // Current instruction to decode
-    input wire [1:0] programSelect,    // Selects which program to execute
     input wire clk,                    // Clock signal
     input wire rst,                    // Reset signal, sets PC to 0
-    input wire [7:0] extInputDataSW,     // Add this new input
+    input wire [7:0] extInputDataSW,   // External input data
     
     // Output control signals
     output reg [7:0] instructionAddress,  // Program Counter - Address of next instruction
