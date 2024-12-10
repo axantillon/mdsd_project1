@@ -60,7 +60,8 @@ module top (
         .writeEnable(writeEnable),
         .halt(halt),
         .extInputDataSW(extInputDataSW),
-        .selectedInputData(selectedInputData)
+        .selectedInputData(selectedInputData),
+        .haltCondition(haltCondition)
     );
 
     // Datapath
@@ -77,7 +78,8 @@ module top (
         .bAddress(bAddress),
         .aluOpCode(aluOpCode),
         .R15_out(R15_value),
-        .haltCondition(halt)
+        .halt(halt),
+        .haltCondition(haltCondition)
     );
 
     // Display control
