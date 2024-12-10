@@ -24,39 +24,40 @@ module instructionMemory (
 
         //Program 1: Sum integers from 1 to N   
     reg [15:0] sumIntegersProgram [0:127];
-    initial begin
-        // 1. Load N from external input into R1
+        initial begin
+        // Load N from input
         sumIntegersProgram[0] = 16'b0001_0001_0000_0000;  // R1 = INPUT
+        
+        // Initialize sum register
+        sumIntegersProgram[1] = 16'b0000_0010_0000_0000;  // R2 = 0 (sum)
+        
+        // Add 1
+        sumIntegersProgram[2] = 16'b0000_0011_0000_0001;  // R3 = 1
+        sumIntegersProgram[3] = 16'b0100_0010_0010_0011;  // R2 = R2 + R3
+        
+        // Add 2 if N >= 2
+        sumIntegersProgram[4] = 16'b0000_0011_0000_0010;  // R3 = 2
+        sumIntegersProgram[5] = 16'b1011_0100_0001_0011;  // R4 = (N >= 2)
+        sumIntegersProgram[6] = 16'b0011_0101_0010_0011;  // R5 = R2 + R3 (conditional sum)
+        sumIntegersProgram[7] = 16'b0011_0010_0101_0100;  // R2 = R5 if N>=2
 
-        // 2. Initialize counter (R2) with 1
-        sumIntegersProgram[1] = 16'b0000_0010_0000_0001;  // R2 = 1
+        // Add 3 if N >= 3
+        sumIntegersProgram[8] = 16'b0000_0011_0000_0011;  // R3 = 3
+        sumIntegersProgram[9] = 16'b1011_0100_0001_0011;  // R4 = (N >= 3)
+        sumIntegersProgram[10] = 16'b0011_0101_0010_0011;  // R5 = R2 + R3
+        sumIntegersProgram[11] = 16'b0011_0010_0101_0100;  // R2 = R5 if N>=3
 
-        // 3. Initialize sum (R3) with 0
-        sumIntegersProgram[2] = 16'b0000_0011_0000_0000;  // R3 = 0
+        // Add 4 if N >= 4
+        sumIntegersProgram[12] = 16'b0000_0011_0000_0100;  // R3 = 4
+        sumIntegersProgram[13] = 16'b1011_0100_0001_0011;  // R4 = (N >= 4)
+        sumIntegersProgram[14] = 16'b0011_0101_0010_0011;  // R5 = R2 + R3
+        sumIntegersProgram[15] = 16'b0011_0010_0101_0100;  // R2 = R5 if N>=4
 
-        // 4. LOOP START: Add current counter to sum
-        sumIntegersProgram[3] = 16'b0100_0011_0011_0010;  // R3 = R3 + R2
+        // Copy final result to output
+        sumIntegersProgram[16] = 16'b0010_1111_0010_0000;  // R15 = R2
 
-        // 5. Check for overflow (R3 > 255)
-        sumIntegersProgram[4] = 16'b0000_0100_1111_1111;  // R4 = 255
-        sumIntegersProgram[5] = 16'b1011_0101_0011_0100;  // R5 = (R3 > R4)
-        sumIntegersProgram[6] = 16'b1100_0000_0101_0001;  // If R5=1, jump to cap value
-        sumIntegersProgram[7] = 16'b0010_0000_0000_0001;  // Skip next instruction
-        sumIntegersProgram[8] = 16'b0000_0011_1111_1111;  // R3 = 255 (cap value) - Changed to immediate load
-
-        // 6. Increment counter
-        sumIntegersProgram[9] = 16'b0100_0010_0010_0001;  // R2 = R2 + 1 - Fixed increment
-
-        // 7. Compare counter with N
-        sumIntegersProgram[10] = 16'b1011_0100_0010_0001;  // R4 = (R2 > R1)
-        sumIntegersProgram[11] = 16'b1100_0000_0100_0010;  // If R4=1, exit loop
-        sumIntegersProgram[12] = 16'b0010_0000_1111_1101;  // Jump back to instruction 3 - Fixed jump offset
-
-        // 8. Copy result to output
-        sumIntegersProgram[13] = 16'b0010_1111_0011_0000;  // R15 = R3
-
-        // 9. Halt
-        sumIntegersProgram[14] = 16'b1110_0000_0000_0000;  // HALT
+        // Halt
+        sumIntegersProgram[17] = 16'b1110_0000_0000_0000;  // HALT
     end
 
     //Testing Instructions for Program 1
@@ -72,34 +73,46 @@ module instructionMemory (
 
    // Program 2: Compute square of N
     reg [15:0] squareOfNProgram [0:127];
+    // Program 2: Compute square of N   
     initial begin
-        //| Step | Instruction | Binary (16-bit) | Hex | Description |
-        //| 1 | INPUT → R1 | 0001_0001_0000_0000 | 0x1100 | Load external input (N) into R1 |
-        squareOfNProgram[0] = 16'b0001_0001_0000_0000; // R1 = INPUT
+        // Load N from input
+        squareOfNProgram[0] = 16'b0001_0001_0000_0000;  // R1 = INPUT
+        
+        // Initialize result register
+        squareOfNProgram[1] = 16'b0000_0010_0000_0000;  // R2 = 0 (result)
 
-        //| 2 | R2 ← R1 | 0000_0010_0000_0001 | 0x0201 | Copy input (R1) into R2 |
-        squareOfNProgram[1] = 16'b0000_0010_0000_0001; // R2 = R1
+        // First addition (always happens)
+        squareOfNProgram[2] = 16'b0100_0010_0010_0001;  // R2 = R2 + R1
 
-        //| 3 | R3 ← R1 * R2 | 0011_0011_0010_0000 | 0x3320 | Square input (N) |
-        squareOfNProgram[2] = 16'b0011_0011_0010_0000; // R3 = R1 * R2
+        // Second addition (if N >= 2)
+        squareOfNProgram[3] = 16'b0000_0011_0000_0010;  // R3 = 2
+        squareOfNProgram[4] = 16'b1011_0100_0001_0011;  // R4 = (N >= 2)
+        squareOfNProgram[5] = 16'b0011_0101_0010_0001;  // R5 = R2 + R1
+        squareOfNProgram[6] = 16'b0011_0010_0101_0100;  // R2 = R5 if N>=2
 
-        //| 4 | R4 ← 255 | 0000_0100_1111_1111 | 0x04FF | Load maximum value (255) into R4 |
-        squareOfNProgram[3] = 16'b0000_0100_1111_1111; // R4 = 255
+        // Third addition (if N >= 3)
+        squareOfNProgram[7] = 16'b0000_0011_0000_0011;  // R3 = 3
+        squareOfNProgram[8] = 16'b1011_0100_0001_0011;  // R4 = (N >= 3)
+        squareOfNProgram[9] = 16'b0011_0101_0010_0001;  // R5 = R2 + R1
+        squareOfNProgram[10] = 16'b0011_0010_0101_0100;  // R2 = R5 if N>=3
 
-        //| 5 | R5 ← (R3 > R4) | 1011_0101_0011_0100 | 0xB534 | Compare square result to 255 |
-        squareOfNProgram[4] = 16'b1011_0101_0011_0100; // R5 = (R3 > R4)
+        // Fourth addition (if N >= 4)
+        squareOfNProgram[11] = 16'b0000_0011_0000_0100;  // R3 = 4
+        squareOfNProgram[12] = 16'b1011_0100_0001_0011;  // R4 = (N >= 4)
+        squareOfNProgram[13] = 16'b0011_0101_0010_0001;  // R5 = R2 + R1
+        squareOfNProgram[14] = 16'b0011_0010_0101_0100;  // R2 = R5 if N>=4
 
-        //| 6 | IF R5 JUMP +1 | 1100_0000_0000_0001 | 0xC001 | If R3 > R4, jump to cap |
-        squareOfNProgram[5] = 16'b1100_0000_0000_0001; // If overflow, jump
+        // Check for overflow (>255)
+        squareOfNProgram[15] = 16'b0000_0011_1111_1111;  // R3 = 255
+        squareOfNProgram[16] = 16'b1011_0100_0010_0011;  // R4 = (result > 255)
+        squareOfNProgram[17] = 16'b0011_0101_0011_0100;  // R5 = 255 if overflow
+        squareOfNProgram[18] = 16'b0011_0010_0101_0100;  // R2 = R5 if overflow
 
-        //| 7 | R3 ← 255 | 0010_0011_0100_0000 | 0x2340 | Cap square result at 255 |
-        squareOfNProgram[6] = 16'b0010_0011_0100_0000; // R3 = 255
+        // Copy to output
+        squareOfNProgram[19] = 16'b0010_1111_0010_0000;  // R15 = R2
 
-        //| 8 | R6 ← R3 | 0010_1110_0011_0000 | 0x2E30 | Copy final result to R6 |
-        squareOfNProgram[7] = 16'b0010_1110_0011_0000; // R6 = R3
-
-        //| 9 | HALT | 1110_0000_0000_0000 | 0xE000 | End program |
-        squareOfNProgram[8] = 16'b1110_0000_0000_0000; // HALT
+        // Halt
+        squareOfNProgram[20] = 16'b1110_0000_0000_0000;  // HALT
     end
 
 
@@ -155,79 +168,47 @@ module instructionMemory (
     // R15: Output register
     reg [15:0] fourthProgram [0:127];
     initial begin
-        // Load number of iterations from external input into R1
-        // Opcode: 0001 (Load External) | Dest: 0001 (R1) | Src: 0000 | Immediate: 0000
-        fourthProgram[0] = 16'b0001_0001_0000_0000;  // R1 = Input
+        // Load N from input
+        fourthProgram[0] = 16'b0001_0001_0000_0000;  // R1 = INPUT
+        
+        // Initialize first two numbers
+        fourthProgram[1] = 16'b0000_0010_0000_0000;  // R2 = 0 (F0)
+        fourthProgram[2] = 16'b0000_0011_0000_0001;  // R3 = 1 (F1)
+        
+        // First number is 1 if N >= 1
+        fourthProgram[3] = 16'b0000_0100_0000_0001;  // R4 = 1
+        fourthProgram[4] = 16'b1011_0101_0001_0100;  // R5 = (N >= 1)
+        fourthProgram[5] = 16'b0011_0110_0011_0101;  // R6 = R3 if N>=1
+        
+        // Second number (1) if N >= 2
+        fourthProgram[6] = 16'b0100_0111_0010_0011;  // R7 = F0 + F1
+        fourthProgram[7] = 16'b0000_0100_0000_0010;  // R4 = 2
+        fourthProgram[8] = 16'b1011_0101_0001_0100;  // R5 = (N >= 2)
+        fourthProgram[9] = 16'b0011_0110_0111_0101;  // R6 = R7 if N>=2
+        
+        // Third number (2) if N >= 3
+        fourthProgram[10] = 16'b0100_0111_0011_0110;  // R7 = F1 + F2
+        fourthProgram[11] = 16'b0000_0100_0000_0011;  // R4 = 3
+        fourthProgram[12] = 16'b1011_0101_0001_0100;  // R5 = (N >= 3)
+        fourthProgram[13] = 16'b0011_0110_0111_0101;  // R6 = R7 if N>=3
+        
+        // Fourth number (3) if N >= 4
+        fourthProgram[14] = 16'b0100_0111_0110_0011;  // R7 = F2 + F3
+        fourthProgram[15] = 16'b0000_0100_0000_0100;  // R4 = 4
+        fourthProgram[16] = 16'b1011_0101_0001_0100;  // R5 = (N >= 4)
+        fourthProgram[17] = 16'b0011_0110_0111_0101;  // R6 = R7 if N>=4
 
-        // Initialize F(0) = 0 in R2
-        // Opcode: 0000 (Set Constant) | Dest: 0010 (R2) | Value: 0000_0000
-        fourthProgram[1] = 16'b0000_0010_0000_0000;  
+        // Check for overflow
+        fourthProgram[18] = 16'b0000_0100_1111_1111;  // R4 = 255
+        fourthProgram[19] = 16'b1011_0101_0110_0100;  // R5 = (result > 255)
+        fourthProgram[20] = 16'b0011_0111_0100_0101;  // R7 = 255 if overflow
+        fourthProgram[21] = 16'b0011_0110_0111_0101;  // R6 = R7 if overflow
 
-        // Initialize F(1) = 1 in R3
-        // Opcode: 0000 (Set Constant) | Dest: 0011 (R3) | Value: 0000_0001
-        fourthProgram[2] = 16'b0000_0011_0000_0001;  
-
-        // Initialize counter R5 = 2 (we already have F(0) and F(1))
-        // Opcode: 0000 (Set Constant) | Dest: 0101 (R5) | Value: 0000_0010
-        fourthProgram[3] = 16'b0000_0101_0000_0010;  
-
-        // Load max value (255) into R6 for overflow checking
-        // Opcode: 0000 (Set Constant) | Dest: 0110 (R6) | Value: 1111_1111
-        fourthProgram[4] = 16'b0000_0110_1111_1111;  
-
-        // LOOP START - Calculate next Fibonacci number
-        // R4 = R2 + R3 (Next = Previous + Current)
-        // Opcode: 0100 (Add) | Dest: 0100 (R4) | Src1: 0010 (R2) | Src2: 0011 (R3)
-        fourthProgram[5] = 16'b0100_0100_0010_0011;  
-
-        // Check for overflow: Compare R4 with max value (255)
-        // Opcode: 1011 (Compare >) | Dest: 0111 (R7) | Src1: 0100 (R4) | Src2: 0110 (R6)
-        fourthProgram[6] = 16'b1011_0111_0100_0110;  // R7 = (R4 > R6)
-
-        // If overflow detected, jump to end with max value
-        // Opcode: 1100 (Cond Jump) | Cond: 0000 | Src: 0111 (R7) | Offset: 0110 (+6)
-        fourthProgram[7] = 16'b1100_0000_0111_0110;  // If R7 = 1, jump +6 to max value
-
-        // No overflow - continue sequence
-        // Update previous (R2 = R3)
-        // Opcode: 0010 (Copy) | Dest: 0010 (R2) | Src: 0011 (R3) | Unused: 0000
-        fourthProgram[8] = 16'b0010_0010_0011_0000;  
-
-        // Update current (R3 = R4)
-        // Opcode: 0010 (Copy) | Dest: 0011 (R3) | Src: 0100 (R4) | Unused: 0000
-        fourthProgram[9] = 16'b0010_0011_0100_0000;  
-
-        // Increment counter (R5 = R5 + 1)
-        // Opcode: 0100 (Add) | Dest: 0101 (R5) | Src1: 0101 (R5) | Src2: 0110 (1)
-        fourthProgram[10] = 16'b0100_0101_0101_0110;  
-
-        // Compare counter with N (R7 = R5 > R1)
-        // Opcode: 1011 (Compare >) | Dest: 0111 (R7) | Src1: 0101 (R5) | Src2: 0001 (R1)
-        fourthProgram[11] = 16'b1011_0111_0101_0001;  
-
-        // If counter <= N, continue loop
-        // Opcode: 1100 (Cond Jump) | Cond: 0000 | Src: 0111 (R7) | Offset: 0010 (+2)
-        fourthProgram[12] = 16'b1100_0000_0111_0010;  
-
-        // Jump back to loop start
-        // Opcode: 0010 (Jump) | Unused: 0000 | Offset: 1000 (-8)
-        fourthProgram[13] = 16'b0010_0000_0000_1000;  
-
-        // Store result in R15 (normal case)
-        // Opcode: 0010 (Copy) | Dest: 1111 (R15) | Src: 0011 (R3) | Unused: 0000
-        fourthProgram[14] = 16'b0010_1111_0011_0000;  // R15 = R3
-
-        // Jump to end
-        // Opcode: 0010 (Jump) | Unused: 0000 | Offset: 0001 (+1)
-        fourthProgram[15] = 16'b0010_0000_0000_0001;  // Jump +1
-
-        // Overflow case - store max value (255) in R15
-        // Opcode: 0010 (Copy) | Dest: 1111 (R15) | Src: 0110 (R6) | Unused: 0000
-        fourthProgram[16] = 16'b0010_1111_0110_0000;  // R15 = R6 (225)
+        // Copy to output
+        fourthProgram[22] = 16'b0010_1111_0110_0000;  // R15 = R6
 
         // Halt
-        // Opcode: 1110 (Halt) | Unused: 0000_0000_0000
-        fourthProgram[17] = 16'b1110_0000_0000_0000;
+        fourthProgram[23] = 16'b1110_0000_0000_0000;  // HALT
     end
 
     // Modified program selection logic with priority encoding
