@@ -29,67 +29,6 @@ module instructionMemory (
     end
 
 
-    //Program 1: Sum of all integers from 1 to N
-
-    //Uses R1 to store N (from external input)
-    //Uses R2 as the counter (1 to N)
-    //Uses R3 to accumulate the sum
-    //Uses R4 and R5 for comparisons
-    //Implements a loop that adds numbers from 1 to N
-    //Checks if sum exceeds 255 and caps it
-    //Stores final result in R15
-    //Uses conditional jumps to implement the loop and overflow check
-    //The program will work for any input N and will cap the result at 255 if it exceeds that value. For example:
-    //For N=5: Sum will be 15 (1+2+3+4+5)
-    //For N=10: Sum will be 55 (1+2+3+4+5+6+7+8+9+10)
-    //For N=23: Sum will be 255 (capped, as actual sum would be 276)
-
-
-
-     reg [15:0] firstProgram [0:127];
-    initial begin
-        // Load external input (N) into R1
-        firstProgram[0] = 16'b0001_0001_0000_0000;  // R1 = INPUT
-
-        // Initialize R2 as counter, starting from 1
-        firstProgram[1] = 16'b0000_0010_0000_0001;  // R2 = 1
-
-        // Initialize R3 as sum, starting from 0
-        firstProgram[2] = 16'b0000_0011_0000_0000;  // R3 = 0
-
-        // Start of loop
-        // Add current counter (R2) to sum (R3)
-        firstProgram[3] = 16'b0100_0011_0011_0010;  // R3 = R3 + R2
-
-        // Check if R3 > 255, if so, set R3 to 255
-        firstProgram[4] = 16'b0000_0100_1111_1111;  // R4 = 255
-        firstProgram[5] = 16'b1011_0101_0011_0100;  // R5 = (R3 > R4)
-        firstProgram[6] = 16'b1100_0000_0101_0001;  // IF R5 THEN JUMP to 8
-        firstProgram[7] = 16'b0010_0000_0000_0001;  // JUMP to next instruction
-        firstProgram[8] = 16'b0010_0011_0100_0000;  // R3 = 255
-
-        // Increment counter
-        firstProgram[9] = 16'b0100_0010_0010_0110;  // R2 = R2 + 1 (R6 is assumed to be 1)
-
-        // Compare if counter <= N (R1)
-        firstProgram[10] = 16'b1011_0100_0010_0001;  // R4 = (R2 > R1)
-        firstProgram[11] = 16'b1100_0000_0100_0010;  // IF R4 THEN JUMP to final
-        firstProgram[12] = 16'b0010_0000_0000_0011;  // JUMP back to loop start
-
-        // Copy final result to R15
-        firstProgram[13] = 16'b0010_1111_0011_0000;  // R15 = R3
-
-        // Halt execution
-        firstProgram[14] = 16'b1110_0000_0000_0000;  // HALT execution
-    end
-
-
-
-
-
-
-
-
 
 
     // Program 3: Load 4 into R1; Load 5 into R2; Add R1 and R2, store in R15
