@@ -137,47 +137,47 @@ module instructionMemory (
     initial begin
         // Load 5 into R1
         // After: R1 = 0000_0101 (5)
-        fourthProgram[0] = 16'b0000_0001_0000_0101;  // Set R1 = 5
-        fourthProgram[1] = 16'b0010_1111_0001_0000;  // Debug: Copy R1 to R15 to verify R1 = 5
+        fourthProgram[0] = 16'b0001_0001_0000_0000;  // Set R1 = 5
+        fourthProgram[1] = 16'b0000_0010_0000_0000;  // Debug: Copy R1 to R15 to verify R1 = 5
 
         // Load 3 into R2
         // After: R2 = 0000_0011 (3)
-        fourthProgram[2] = 16'b0000_0010_0000_0011;  // Set R2 = 3
-        fourthProgram[3] = 16'b0010_1111_0010_0000;  // Debug: Copy R2 to R15 to verify R2 = 3
+        fourthProgram[2] = 16'b0000_0011_0000_0001;  // Set R2 = 3
+        fourthProgram[3] = 16'b0000_0101_0000_0010;  // Debug: Copy R2 to R15 to verify R2 = 3
 
         // Copy R1 to R3
         // After: R3 = 0000_0101 (5)
-        fourthProgram[4] = 16'b0010_0011_0001_0000;  // R3 = R1 (5)
-        fourthProgram[5] = 16'b0010_1111_0011_0000;  // Debug: Copy R3 to R15 to verify R3 = 5
+        fourthProgram[4] = 16'b0000_0110_1111_1111;  // R3 = R1 (5)
+        fourthProgram[5] = 16'b0100_0100_0010_0011;  // Debug: Copy R3 to R15 to verify R3 = 5
 
         // AND R1 and R2, store in R4
         // After: R4 = 0000_0001 (1) from 0101 & 0011
-        fourthProgram[6] = 16'b0110_0100_0001_0010;  // R4 = R1 & R2 (1)
-        fourthProgram[7] = 16'b0010_1111_0100_0000;  // Debug: Copy R4 to R15 to verify R4 = 1
+        fourthProgram[6] = 16'b1011_0111_0100_0110;  // R4 = R1 & R2 (1)
+        fourthProgram[7] = 16'b1100_0000_0111_0110;  // Debug: Copy R4 to R15 to verify R4 = 1
 
         // OR R1 and R2, store in R5
         // After: R5 = 0000_0111 (7) from 0101 | 0011
-        fourthProgram[8] = 16'b0111_0101_0001_0010;  // R5 = R1 | R2 (7)
-        fourthProgram[9] = 16'b0010_1111_0101_0000;  // Debug: Copy R5 to R15 to verify R5 = 7
+        fourthProgram[8] = 16'b0010_0010_0011_0000;  // R5 = R1 | R2 (7)
+        fourthProgram[9] = 16'b0010_0011_0100_0000;  // Debug: Copy R5 to R15 to verify R5 = 7
 
         // Compare R1 > R2, store in R6
         // After: R6 = 0000_0001 (1) since 5 > 3 is true
-        fourthProgram[10] = 16'b1011_0110_0001_0010;  // R6 = R1 > R2 (1)
-        fourthProgram[11] = 16'b0010_1111_0110_0000;  // Debug: Copy R6 to R15 to verify R6 = 1
+        fourthProgram[10] = 16'b0100_0101_0101_0110;  // R6 = R1 > R2 (1)
+        fourthProgram[11] = 16'b1011_0111_0101_0001;  // Debug: Copy R6 to R15 to verify R6 = 1
 
         // Shift R1 left by 1, store in R7
         // After: R7 = 0000_1010 (10) from 0101 << 1
-        fourthProgram[12] = 16'b1000_0111_0001_0000;  // R7 = R1 << 1 (10)
-        fourthProgram[13] = 16'b0010_1111_0111_0000;  // Debug: Copy R7 to R15 to verify R7 = 10
+        fourthProgram[12] = 16'b1100_0000_0111_0010;  // R7 = R1 << 1 (10)
+        fourthProgram[13] = 16'b0010_0000_0000_1000;  // Debug: Copy R7 to R15 to verify R7 = 10
 
         // Negate R2, store in R8
         // After: R8 = 1111_1101 (-3) 2's complement of 0011
-        fourthProgram[14] = 16'b0101_1000_0010_0000;  // R8 = -R2 (-3)
-        fourthProgram[15] = 16'b0010_1111_1000_0000;  // Debug: Copy R8 to R15 to verify R8 = -3
+        fourthProgram[14] = 16'b0010_1111_0011_0000;  // R8 = -R2 (-3)
+        fourthProgram[15] = 16'b0010_0000_0000_0001;  // Debug: Copy R8 to R15 to verify R8 = -3
 
         // Add R7 and R8, store in R15
         // After: R15 = 0000_0111 (7) from 1010 + 11111101
-        fourthProgram[16] = 16'b0100_1111_0111_1000;  // R15 = R7 + R8 (7)
+        fourthProgram[16] = 16'b0010_1111_0110_0000;  // R15 = R7 + R8 (7)
         // No need for debug copy since result is already in R15
 
         // Halt
