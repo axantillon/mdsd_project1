@@ -23,6 +23,7 @@ module instructionMemory (
     //| 15 | HALT | 1110_0000_0000_0000 | 0xE000 | Stop program execution |
 
     //Program 1: Sum integers from 1 to N   
+    reg [15:0] sumIntegersProgram [0:127];
     initial begin
         // 1. Load N from external input into R1 (N will be 4 bits: 0-15)
         sumIntegersProgram[0] = 16'b0001_0001_0000_0000;  // R1 = INPUT
@@ -59,16 +60,36 @@ module instructionMemory (
         sumIntegersProgram[14] = 16'b1110_0000_0000_0000;  // HALT
     end
 
+   // Program 2: Compute square of N
     reg [15:0] squareOfNProgram [0:127];
     initial begin
-        squareOfNProgram[0] = 16'b0010000000000001;
-        squareOfNProgram[1] = 16'b0010000000000010;
-        squareOfNProgram[2] = 16'b0010000000000011;
-        squareOfNProgram[3] = 16'b0010000000000100;
-        squareOfNProgram[4] = 16'b0010000000000101;
-        squareOfNProgram[5] = 16'b0010000000000110;
-        squareOfNProgram[6] = 16'b0010000000000111;
-        squareOfNProgram[7] = 16'b0010000000001000;
+        //| Step | Instruction | Binary (16-bit) | Hex | Description |
+        //| 1 | INPUT → R1 | 0001_0001_0000_0000 | 0x1100 | Load external input (N) into R1 |
+        squareOfNProgram[0] = 16'b0001_0001_0000_0000; // R1 = INPUT
+
+        //| 2 | R2 ← R1 | 0000_0010_0000_0001 | 0x0201 | Copy input (R1) into R2 |
+        squareOfNProgram[1] = 16'b0000_0010_0000_0001; // R2 = R1
+
+        //| 3 | R3 ← R1 * R2 | 0011_0011_0010_0000 | 0x3320 | Square input (N) |
+        squareOfNProgram[2] = 16'b0011_0011_0010_0000; // R3 = R1 * R2
+
+        //| 4 | R4 ← 255 | 0000_0100_1111_1111 | 0x04FF | Load maximum value (255) into R4 |
+        squareOfNProgram[3] = 16'b0000_0100_1111_1111; // R4 = 255
+
+        //| 5 | R5 ← (R3 > R4) | 1011_0101_0011_0100 | 0xB534 | Compare square result to 255 |
+        squareOfNProgram[4] = 16'b1011_0101_0011_0100; // R5 = (R3 > R4)
+
+        //| 6 | IF R5 JUMP +1 | 1100_0000_0000_0001 | 0xC001 | If R3 > R4, jump to cap |
+        squareOfNProgram[5] = 16'b1100_0000_0000_0001; // If overflow, jump
+
+        //| 7 | R3 ← 255 | 0010_0011_0100_0000 | 0x2340 | Cap square result at 255 |
+        squareOfNProgram[6] = 16'b0010_0011_0100_0000; // R3 = 255
+
+        //| 8 | R6 ← R3 | 0010_1110_0011_0000 | 0x2E30 | Copy final result to R6 |
+        squareOfNProgram[7] = 16'b0010_1110_0011_0000; // R6 = R3
+
+        //| 9 | HALT | 1110_0000_0000_0000 | 0xE000 | End program |
+        squareOfNProgram[8] = 16'b1110_0000_0000_0000; // HALT
     end
 
 
