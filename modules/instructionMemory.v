@@ -122,72 +122,101 @@ module instructionMemory (
         thirdProgram[5] = 16'b1110_0000_0000_0000;
     end
 
-    // Program 4: Calculate Fibonacci Sequence
-    // Expected register values after each instruction:
-    // R1 = Number of iterations (N)
-    // R2 = Previous number (F(n-2))
-    // R3 = Current number (F(n-1))
-    // R4 = Next number in sequence (F(n))
-    // R5 = Loop counter
-    // R6 = Used for overflow comparison
-    // R15 = Final result
+    // Program 4: Calculate Fibonacci sequence
+    // Instruction Format:
+    // 16-bit instruction: [15:12] opcode | [11:8] dest_reg | [7:4] src1_reg | [3:0] src2_reg/immediate
+    // Common Opcodes:
+    // 0000 = Set Register to Constant
+    // 0001 = Load from External Input
+    // 0010 = Copy Register/Jump
+    // 0100 = Add
+    // 0101 = Negate
+    // 1011 = Compare Greater Than
+    // 1100 = Conditional Jump
+    // 1110 = Halt
+    // Register usage:
+    // R1: Number of iterations (N)
+    // R2: Previous number (F(n-2))
+    // R3: Current number (F(n-1))
+    // R4: Next number in sequence (F(n))
+    // R5: Loop counter
+    // R6: Used for overflow comparison (255)
+    // R7: Temporary comparison results
+    // R15: Output register
     reg [15:0] fourthProgram [0:127];
     initial begin
-        // Load number of iterations into R1 (from input)
+        // Load number of iterations from external input into R1
+        // Opcode: 0001 (Load External) | Dest: 0001 (R1) | Src: 0000 | Immediate: 0000
         fourthProgram[0] = 16'b0001_0001_0000_0000;  // R1 = Input
 
-        //Initialize first two Fibonacci numbers
-        // R2 = 0 (F(0))
+        // Initialize F(0) = 0 in R2
+        // Opcode: 0000 (Set Constant) | Dest: 0010 (R2) | Value: 0000_0000
         fourthProgram[1] = 16'b0000_0010_0000_0000;  
 
-        // R3 = 1 (F(1))
+        // Initialize F(1) = 1 in R3
+        // Opcode: 0000 (Set Constant) | Dest: 0011 (R3) | Value: 0000_0001
         fourthProgram[2] = 16'b0000_0011_0000_0001;  
 
         // Initialize counter R5 = 2 (we already have F(0) and F(1))
+        // Opcode: 0000 (Set Constant) | Dest: 0101 (R5) | Value: 0000_0010
         fourthProgram[3] = 16'b0000_0101_0000_0010;  
 
         // Load max value (255) into R6 for overflow checking
+        // Opcode: 0000 (Set Constant) | Dest: 0110 (R6) | Value: 1111_1111
         fourthProgram[4] = 16'b0000_0110_1111_1111;  
 
         // LOOP START - Calculate next Fibonacci number
         // R4 = R2 + R3 (Next = Previous + Current)
+        // Opcode: 0100 (Add) | Dest: 0100 (R4) | Src1: 0010 (R2) | Src2: 0011 (R3)
         fourthProgram[5] = 16'b0100_0100_0010_0011;  
 
         // Check for overflow: Compare R4 with max value (255)
+        // Opcode: 1011 (Compare >) | Dest: 0111 (R7) | Src1: 0100 (R4) | Src2: 0110 (R6)
         fourthProgram[6] = 16'b1011_0111_0100_0110;  // R7 = (R4 > R6)
 
         // If overflow detected, jump to end with max value
+        // Opcode: 1100 (Cond Jump) | Cond: 0000 | Src: 0111 (R7) | Offset: 0110 (+6)
         fourthProgram[7] = 16'b1100_0000_0111_0110;  // If R7 = 1, jump +6 to max value
 
         // No overflow - continue sequence
         // Update previous (R2 = R3)
+        // Opcode: 0010 (Copy) | Dest: 0010 (R2) | Src: 0011 (R3) | Unused: 0000
         fourthProgram[8] = 16'b0010_0010_0011_0000;  
 
         // Update current (R3 = R4)
+        // Opcode: 0010 (Copy) | Dest: 0011 (R3) | Src: 0100 (R4) | Unused: 0000
         fourthProgram[9] = 16'b0010_0011_0100_0000;  
 
         // Increment counter (R5 = R5 + 1)
+        // Opcode: 0100 (Add) | Dest: 0101 (R5) | Src1: 0101 (R5) | Src2: 0110 (1)
         fourthProgram[10] = 16'b0100_0101_0101_0110;  
 
         // Compare counter with N (R7 = R5 > R1)
+        // Opcode: 1011 (Compare >) | Dest: 0111 (R7) | Src1: 0101 (R5) | Src2: 0001 (R1)
         fourthProgram[11] = 16'b1011_0111_0101_0001;  
 
         // If counter <= N, continue loop
+        // Opcode: 1100 (Cond Jump) | Cond: 0000 | Src: 0111 (R7) | Offset: 0010 (+2)
         fourthProgram[12] = 16'b1100_0000_0111_0010;  
 
         // Jump back to loop start
+        // Opcode: 0010 (Jump) | Unused: 0000 | Offset: 1000 (-8)
         fourthProgram[13] = 16'b0010_0000_0000_1000;  
 
         // Store result in R15 (normal case)
+        // Opcode: 0010 (Copy) | Dest: 1111 (R15) | Src: 0011 (R3) | Unused: 0000
         fourthProgram[14] = 16'b0010_1111_0011_0000;  // R15 = R3
 
         // Jump to end
+        // Opcode: 0010 (Jump) | Unused: 0000 | Offset: 0001 (+1)
         fourthProgram[15] = 16'b0010_0000_0000_0001;  // Jump +1
 
         // Overflow case - store max value (255) in R15
+        // Opcode: 0010 (Copy) | Dest: 1111 (R15) | Src: 0110 (R6) | Unused: 0000
         fourthProgram[16] = 16'b0010_1111_0110_0000;  // R15 = R6 (225)
 
         // Halt
+        // Opcode: 1110 (Halt) | Unused: 0000_0000_0000
         fourthProgram[17] = 16'b1110_0000_0000_0000;
     end
 
