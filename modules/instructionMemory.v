@@ -122,63 +122,70 @@ module instructionMemory (
         thirdProgram[5] = 16'b1110_0000_0000_0000;
     end
 
-    // Program 4: Test multiple operations
+    // Program 4: Calculate Fibonacci Sequence
     // Expected register values after each instruction:
-    // R1 = 5     (0000_0101)
-    // R2 = 3     (0000_0011)
-    // R3 = 5     (0000_0101) copied from R1
-    // R4 = 1     (0000_0001) from 5 AND 3  (0101 & 0011)
-    // R5 = 7     (0000_0111) from 5 OR 3   (0101 | 0011)
-    // R6 = 1     (0000_0001) from 5 > 3    (true)
-    // R7 = 10    (0000_1010) from 5 << 1   (0101 << 1)
-    // R8 = -3    (1111_1101) from NEG 3    (2's complement of 0011)
-    // R15 = 7    (0000_0111) from 10 + -3  (1010 + 11111101)
+    // R1 = Number of iterations (N)
+    // R2 = Previous number (F(n-2))
+    // R3 = Current number (F(n-1))
+    // R4 = Next number in sequence (F(n))
+    // R5 = Loop counter
+    // R6 = Used for overflow comparison
+    // R15 = Final result
     reg [15:0] fourthProgram [0:127];
     initial begin
-        // Load 5 into R1
-        // After: R1 = 0000_0101 (5)
-        fourthProgram[0] = 16'b0001_0001_0000_0000;  // Set R1 = 5
-        fourthProgram[1] = 16'b0000_0010_0000_0000;  // Debug: Copy R1 to R15 to verify R1 = 5
+        // Load number of iterations into R1 (from input)
+        fourthProgram[0] = 16'b0001_0001_0000_0000;  // R1 = Input
 
-        // Load 3 into R2
-        // After: R2 = 0000_0011 (3)
-        fourthProgram[2] = 16'b0000_0011_0000_0001;  // Set R2 = 3
-        fourthProgram[3] = 16'b0000_0101_0000_0010;  // Debug: Copy R2 to R15 to verify R2 = 3
+        //Initialize first two Fibonacci numbers
+        // R2 = 0 (F(0))
+        fourthProgram[1] = 16'b0000_0010_0000_0000;  
 
-        // Copy R1 to R3
-        // After: R3 = 0000_0101 (5)
-        fourthProgram[4] = 16'b0000_0110_1111_1111;  // R3 = R1 (5)
-        fourthProgram[5] = 16'b0100_0100_0010_0011;  // Debug: Copy R3 to R15 to verify R3 = 5
+        // R3 = 1 (F(1))
+        fourthProgram[2] = 16'b0000_0011_0000_0001;  
 
-        // AND R1 and R2, store in R4
-        // After: R4 = 0000_0001 (1) from 0101 & 0011
-        fourthProgram[6] = 16'b1011_0111_0100_0110;  // R4 = R1 & R2 (1)
-        fourthProgram[7] = 16'b1100_0000_0111_0110;  // Debug: Copy R4 to R15 to verify R4 = 1
+        // Initialize counter R5 = 2 (we already have F(0) and F(1))
+        fourthProgram[3] = 16'b0000_0101_0000_0010;  
 
-        // OR R1 and R2, store in R5
-        // After: R5 = 0000_0111 (7) from 0101 | 0011
-        fourthProgram[8] = 16'b0010_0010_0011_0000;  // R5 = R1 | R2 (7)
-        fourthProgram[9] = 16'b0010_0011_0100_0000;  // Debug: Copy R5 to R15 to verify R5 = 7
+        // Load max value (255) into R6 for overflow checking
+        fourthProgram[4] = 16'b0000_0110_1111_1111;  
 
-        // Compare R1 > R2, store in R6
-        // After: R6 = 0000_0001 (1) since 5 > 3 is true
-        fourthProgram[10] = 16'b0100_0101_0101_0110;  // R6 = R1 > R2 (1)
-        fourthProgram[11] = 16'b1011_0111_0101_0001;  // Debug: Copy R6 to R15 to verify R6 = 1
+        // LOOP START - Calculate next Fibonacci number
+        // R4 = R2 + R3 (Next = Previous + Current)
+        fourthProgram[5] = 16'b0100_0100_0010_0011;  
 
-        // Shift R1 left by 1, store in R7
-        // After: R7 = 0000_1010 (10) from 0101 << 1
-        fourthProgram[12] = 16'b1100_0000_0111_0010;  // R7 = R1 << 1 (10)
-        fourthProgram[13] = 16'b0010_0000_0000_1000;  // Debug: Copy R7 to R15 to verify R7 = 10
+        // Check for overflow: Compare R4 with max value (255)
+        fourthProgram[6] = 16'b1011_0111_0100_0110;  // R7 = (R4 > R6)
 
-        // Negate R2, store in R8
-        // After: R8 = 1111_1101 (-3) 2's complement of 0011
-        fourthProgram[14] = 16'b0010_1111_0011_0000;  // R8 = -R2 (-3)
-        fourthProgram[15] = 16'b0010_0000_0000_0001;  // Debug: Copy R8 to R15 to verify R8 = -3
+        // If overflow detected, jump to end with max value
+        fourthProgram[7] = 16'b1100_0000_0111_0110;  // If R7 = 1, jump +6 to max value
 
-        // Add R7 and R8, store in R15
-        // After: R15 = 0000_0111 (7) from 1010 + 11111101
-        fourthProgram[16] = 16'b0010_1111_0110_0000;  // R15 = R7 + R8 (7)
-        // No need for debug copy since result is already in R15
+        // No overflow - continue sequence
+        // Update previous (R2 = R3)
+        fourthProgram[8] = 16'b0010_0010_0011_0000;  
+
+        // Update current (R3 = R4)
+        fourthProgram[9] = 16'b0010_0011_0100_0000;  
+
+        // Increment counter (R5 = R5 + 1)
+        fourthProgram[10] = 16'b0100_0101_0101_0110;  
+
+        // Compare counter with N (R7 = R5 > R1)
+        fourthProgram[11] = 16'b1011_0111_0101_0001;  
+
+        // If counter <= N, continue loop
+        fourthProgram[12] = 16'b1100_0000_0111_0010;  
+
+        // Jump back to loop start
+        fourthProgram[13] = 16'b0010_0000_0000_1000;  
+
+        // Store result in R15 (normal case)
+        fourthProgram[14] = 16'b0010_1111_0011_0000;  // R15 = R3
+
+        // Jump to end
+        fourthProgram[15] = 16'b0010_0000_0000_0001;  // Jump +1
+
+        // Overflow case - store max value (255) in R15
+        fourthProgram[16] = 16'b0010_1111_0110_0000;  // R15 = R6 (225)
 
         // Halt
         fourthProgram[17] = 16'b1110_0000_0000_0000;
