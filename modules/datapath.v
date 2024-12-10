@@ -75,7 +75,7 @@ module datapath(
     alu alu(
         .OP(aluOpCode), 
         .A(aluA), 
-        .B(aluB),    // Use multiplexed B input
+        .B(aluB),
         .Z(aluZ)
     );
 

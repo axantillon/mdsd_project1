@@ -20,7 +20,7 @@ module alu(
     output reg [7:0] Z
 );
 
-    always @(*) begin  // Use @(*) instead of explicit sensitivity list
+    always @(*) begin  
         case (OP)
             // Pass through operations
             4'b0000: Z = A;           // Pass A

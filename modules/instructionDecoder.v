@@ -98,14 +98,12 @@ module instructionDecoder (
             end
             
             4'b1000: begin  // Shift Left
-                // Value = [3:0] (shift amount)
                 aluOpCode = 4'b0110;  // Shift left operation
                 muxBSelect = 1'b1;    // Use immediate value for shift amount
                 // Lower 4 bits contain shift amount
             end
             
             4'b1001: begin  // Shift Right
-                // Value = [3:0] (shift amount)
                 aluOpCode = 4'b0111;  // Shift right operation
                 muxBSelect = 1'b1;    // Use immediate value for shift amount
                 // Lower 4 bits contain shift amount
@@ -122,8 +120,7 @@ module instructionDecoder (
             end
             
             4'b1110: begin  // Unconditional Halt
-                // No registers used
-                haltCondition = 1'b1;                    // Stop program execution
+                halt = 1'b1;                    // Stop program execution
                 writeEnable = 1'b0;   // Prevent register writes
             end
             
@@ -140,7 +137,7 @@ module instructionDecoder (
             
             default: begin
                 writeEnable = 1'b0;
-                haltCondition = 1'b0;
+                halt = 1'b0;
             end
         endcase
     end
