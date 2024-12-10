@@ -16,7 +16,7 @@ module instructionDecoder (
     output reg muxASelect,                // Selects between immediate value (1) and register A value (0)
     output reg [3:0] aluOpCode,          // Operation code for ALU
     output reg writeEnable,               // Enables writing to register file when high
-    output reg haltCondition   
+    output reg haltCondition,   
     output reg [7:0] selectedInputData   // Add this new output
 );
 
@@ -47,7 +47,7 @@ module instructionDecoder (
         writeSourceSelect = 1'b0;        // Default: use ALU output
         writeEnable = 1'b1;              // Default: enable register write
         aluOpCode = 4'b0000;             // Default: pass A
-        halt = 1'b0;                     // Default: continue execution
+        haltCondition = 1'b0;                    // Default: continue execution
 
         // Form 8-bit immediate value from instruction operands
         selectedInputData = {instruction[7:4], instruction[3:0]};  // Default to immediate value
@@ -123,7 +123,7 @@ module instructionDecoder (
             
             4'b1110: begin  // Unconditional Halt
                 // No registers used
-                halt = 1'b1;          // Stop program execution
+                haltCondition = 1'b1;                    // Stop program execution
                 writeEnable = 1'b0;   // Prevent register writes
             end
             
@@ -140,7 +140,7 @@ module instructionDecoder (
             
             default: begin
                 writeEnable = 1'b0;
-                halt = 1'b0;
+                haltCondition = 1'b0;
             end
         endcase
     end

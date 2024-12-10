@@ -36,6 +36,7 @@ module datapath(
     input [3:0] aAddress,        // Address of register A to read
     input [3:0] bAddress,        // Address of register B to read
     input [3:0] aluOpCode,       // Operation code for ALU
+    input haltCondition,         // Halt condition for conditional halt
     
     // Output signals
     output [7:0] R15_out,        // Value of register 15, always exposed for monitoring
@@ -83,7 +84,7 @@ module datapath(
             halt <= 1'b0;  // Reset halt signal
         end else if (haltCondition) begin
             // Check the value of the register at aAddress
-            if (regs[aAddress] == 8'b00000000) begin
+            if (regA == 8'b00000000) begin
                 halt <= 1'b1;  // Halt if the register value is zero
             end else begin
                 halt <= 1'b0;  // Continue if the register value is non-zero

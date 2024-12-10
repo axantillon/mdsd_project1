@@ -74,8 +74,8 @@ module clock_divider(
     always @(posedge clk_in) begin
         counter <= counter + 1;
         //clk_out <= counter[26];  // ~0.75 Hz (slowest)
-        clk_out <= counter[25];  // ~1.5 Hz
-        //clk_out <= counter[24];  // ~3 Hz
+        // clk_out <= counter[25];  // ~1.5 Hz
+        clk_out <= counter[24];  // ~3 Hz
         //clk_out <= counter[23];  // ~6 Hz
         // clk_out <= counter[22];  // ~12 Hz (fastest)
     end
