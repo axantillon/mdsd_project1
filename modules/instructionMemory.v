@@ -5,27 +5,27 @@ module instructionMemory (
 );
     //Program 1: Sum integers from 1 to N  
     //Instructions for Program 1 
-    //| Step | Instruction | Binary (16-bit) | Hex | Description |
-    // | 1 | INPUT → R1 | 0001_0001_0000_0000 | 0x1100 | Load external input (N) into R1 |
-    //| 2 | R2 ← 1 | 0000_0010_0000_0001 | 0x0201 | Initialize counter (R2) with 1 |
-    //| 3 | R3 ← 0 | 0000_0011_0000_0000 | 0x0300 | Initialize sum (R3) with 0 |
-    //| 4 | R3 ← R3 + R2 | 0100_0011_0011_0010 | 0x4332 | Add counter to sum |
-    //| 5 | R4 ← 255 | 0000_0100_1111_1111 | 0x04FF | Load max value (255) into R4 |
-    //| 6 | R5 ← (R3 > R4) | 1011_0101_0011_0100 | 0xB534 | Compare if sum > 255 |
-    //| 7 | IF R5 JUMP +1 | 1100_0000_0101_0001 | 0xC051 | If overflow, jump to cap value |
-    //| 8 | JUMP +1 | 0010_0000_0000_0001 | 0x2001 | Skip cap instruction |
-    //| 9 | R3 ← 255 | 0010_0011_0100_0000 | 0x2340 | Cap sum at 255 |
-    //| 10 | R2 ← R2 + 1 | 0100_0010_0010_0110 | 0x4226 | Increment counter |
-    //| 11 | R4 ← (R2 > R1) | 1011_0100_0010_0001 | 0xB421 | Check if counter > N |
-    //| 12 | IF R4 JUMP +2 | 1100_0000_0100_0010 | 0xC042 | If done, exit loop |
-    //| 13 | JUMP -10 | 0010_0000_0000_0011 | 0x2003 | Jump back to loop start |
-    //| 14 | R15 ← R3 | 0010_1111_0011_0000 | 0x2F30 | Copy result to output register |
-    //| 15 | HALT | 1110_0000_0000_0000 | 0xE000 | Stop program execution |
+    // Step # | Instruction | Binary (16-bit) | Hex | Description |
+    // Step 1 | INPUT → R1 | 0001_0001_0000_0000 | 0x1100 | Load external input (N) into R1 |
+    // Step 2 | R2 ← 1 | 0000_0010_0000_0001 | 0x0201 | Initialize counter (R2) with 1 |
+    // Step 3 | R3 ← 0 | 0000_0011_0000_0000 | 0x0300 | Initialize sum (R3) with 0 |
+    // Step 4 | R3 ← R3 + R2 | 0100_0011_0011_0010 | 0x4332 | Add counter to sum |
+    // Step 5 | R4 ← 255 | 0000_0100_1111_1111 | 0x04FF | Load max value (255) into R4 |
+    // Step 6 | R5 ← (R3 > R4) | 1011_0101_0011_0100 | 0xB534 | Compare if sum > 255 |
+    // Step 7 | IF R5 JUMP +1 | 1100_0000_0101_0001 | 0xC051 | If overflow, jump to cap value |
+    // Step 8 | JUMP +1 | 0010_0000_0000_0001 | 0x2001 | Skip cap instruction |
+    // Step 9 | R3 ← 255 | 0010_0011_1111_1111 | 0x2340 | Cap sum at 255 |
+    // Step 10 | R2 ← R2 + 1 | 0100_0010_0010_0001 | 0x4226 | Increment counter |
+    // Step 11 | R4 ← (R2 > R1) | 1011_0100_0010_0001 | 0xB421 | Check if counter > N |
+    // Step 12 | IF R4 JUMP +2 | 1100_0000_0100_0010 | 0xC042 | If done, exit loop |
+    // Step 13 | JUMP -10 | 0010_0000_1111_1101 | 0x2003 | Jump back to loop start |
+    // Step 14 | R15 ← R3 | 0010_1111_0011_0000 | 0x2F30 | Copy result to output register |
+    // Step 15 | HALT | 1110_0000_0000_0000 | 0xE000 | Stop program execution |
 
-    //Program 1: Sum integers from 1 to N   
+        //Program 1: Sum integers from 1 to N   
     reg [15:0] sumIntegersProgram [0:127];
     initial begin
-        // 1. Load N from external input into R1 (N will be 4 bits: 0-15)
+        // 1. Load N from external input into R1
         sumIntegersProgram[0] = 16'b0001_0001_0000_0000;  // R1 = INPUT
 
         // 2. Initialize counter (R2) with 1
@@ -35,30 +35,40 @@ module instructionMemory (
         sumIntegersProgram[2] = 16'b0000_0011_0000_0000;  // R3 = 0
 
         // 4. LOOP START: Add current counter to sum
-        // R3 = R3 + R2
-        sumIntegersProgram[3] = 16'b0100_0011_0011_0010;  // R3 += R2
+        sumIntegersProgram[3] = 16'b0100_0011_0011_0010;  // R3 = R3 + R2
 
-        // 5. Check if sum > 255 (maximum allowed value)
-        sumIntegersProgram[4] = 16'b0000_0100_1111_1111;  // R4 = 255 (load max value)
+        // 5. Check for overflow (R3 > 255)
+        sumIntegersProgram[4] = 16'b0000_0100_1111_1111;  // R4 = 255
         sumIntegersProgram[5] = 16'b1011_0101_0011_0100;  // R5 = (R3 > R4)
-        sumIntegersProgram[6] = 16'b1100_0000_0101_0001;  // If R5=1, jump to cap value (instruction 8)
+        sumIntegersProgram[6] = 16'b1100_0000_0101_0001;  // If R5=1, jump to cap value
         sumIntegersProgram[7] = 16'b0010_0000_0000_0001;  // Skip next instruction
-        sumIntegersProgram[8] = 16'b0010_0011_0100_0000;  // R3 = 255 (cap the value)
+        sumIntegersProgram[8] = 16'b0000_0011_1111_1111;  // R3 = 255 (cap value) - Changed to immediate load
 
         // 6. Increment counter
-        sumIntegersProgram[9] = 16'b0100_0010_0010_0110;  // R2 = R2 + 1
+        sumIntegersProgram[9] = 16'b0100_0010_0010_0001;  // R2 = R2 + 1 - Fixed increment
 
-        // 7. Check if counter <= N
+        // 7. Compare counter with N
         sumIntegersProgram[10] = 16'b1011_0100_0010_0001;  // R4 = (R2 > R1)
         sumIntegersProgram[11] = 16'b1100_0000_0100_0010;  // If R4=1, exit loop
-        sumIntegersProgram[12] = 16'b0010_0000_0000_0011;  // Jump back to loop start
+        sumIntegersProgram[12] = 16'b0010_0000_1111_1101;  // Jump back to instruction 3 - Fixed jump offset
 
-        // 8. Store final result in R15 for output
+        // 8. Copy result to output
         sumIntegersProgram[13] = 16'b0010_1111_0011_0000;  // R15 = R3
 
-        // 9. Halt program
+        // 9. Halt
         sumIntegersProgram[14] = 16'b1110_0000_0000_0000;  // HALT
     end
+
+    //Testing Instructions for Program 1
+    /*To test this program:
+    1. Set switches to input N (a number between 1 and 15)
+    2. Reset the system
+    3. The display should show the sum of numbers from 1 to N, or 255 if the sum exceeds 255
+     Example results:
+        For N=4: Sum should be 10 (1+2+3+4)
+        For N=5: Sum should be 15 (1+2+3+4+5)
+        For N=15: Sum should be 120 (1+2+...+15) */
+
 
    // Program 2: Compute square of N
     reg [15:0] squareOfNProgram [0:127];
