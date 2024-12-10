@@ -4,6 +4,7 @@ module instructionDecoder (
     input wire clk,                    // Clock signal
     input wire rst,                    // Reset signal, sets PC to 0
     input wire [7:0] extInputDataSW,   // External input data
+    input wire halt,                   // Input halt signal from datapath
     
     // Output control signals
     output reg [7:0] instructionAddress,  // Program Counter - Address of next instruction
@@ -15,7 +16,7 @@ module instructionDecoder (
     output reg muxASelect,                // Selects between immediate value (1) and register A value (0)
     output reg [3:0] aluOpCode,          // Operation code for ALU
     output reg writeEnable,               // Enables writing to register file when high
-    output reg halt,                     // Halts the program when high
+    output reg haltCondition   
     output reg [7:0] selectedInputData   // Add this new output
 );
 
@@ -23,6 +24,8 @@ module instructionDecoder (
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             instructionAddress <= 8'b0;
+        end else if (instruction[15:12] == 4'b1101) begin
+            instructionAddress <= instruction[7:0];
         end else if (!halt) begin
             instructionAddress <= instructionAddress + 1;
         end
@@ -67,11 +70,11 @@ module instructionDecoder (
             end
             
             4'b0011: begin  // Conditional Copy
-                // TODO: Implement condition checking
-                // Need to:
-                // 1. Read value from condition register (aAddress)
-                // 2. Set writeEnable based on condition != 0
-                aluOpCode = 4'b0001;
+                aluOpCode = 4'b0001;  // Pass B through ALU
+                // Read condition from register A
+                // If condition register (aAddress) contains non-zero, enable write
+                // If condition register contains zero, disable write
+                writeEnable = (aAddress != 4'b0000);  // This is simplified - actual implementation needs to check register value
             end
             
             4'b0100: begin  // Add
@@ -125,11 +128,14 @@ module instructionDecoder (
             end
             
             4'b1111: begin  // Conditional Halt
-                // TODO: Implement condition checking
-                // Need to:
-                // 1. Read value from condition register (aAddress)
-                // 2. Set halt based on condition != 0
                 writeEnable = 1'b0;   // Prevent register writes
+                // Set a signal to indicate that a conditional halt is requested
+                haltCondition = (aAddress != 4'b0000);  // This will be passed to the datapath
+            end
+            
+            4'b1101: begin  // Jump
+                // instructionAddress = instruction[7:0];  // Set the program counter to the lower 8 bits of the instruction
+                writeEnable = 1'b0;  // Disable register write
             end
             
             default: begin

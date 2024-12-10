@@ -38,7 +38,8 @@ module datapath(
     input [3:0] aluOpCode,       // Operation code for ALU
     
     // Output signals
-    output [7:0] R15_out         // Value of register 15, always exposed for monitoring
+    output [7:0] R15_out,        // Value of register 15, always exposed for monitoring
+    output reg halt               // Output halt signal
 );
 
     // Internal wires
@@ -76,5 +77,18 @@ module datapath(
         .B(aluB),    // Use multiplexed B input
         .Z(aluZ)
     );
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            halt <= 1'b0;  // Reset halt signal
+        end else if (haltCondition) begin
+            // Check the value of the register at aAddress
+            if (regs[aAddress] == 8'b00000000) begin
+                halt <= 1'b1;  // Halt if the register value is zero
+            end else begin
+                halt <= 1'b0;  // Continue if the register value is non-zero
+            end
+        end
+    end
 
 endmodule

@@ -4,7 +4,7 @@ module top (
     input wire [7:0] programSelect,
     input wire [7:0] extInputDataSW,
     output wire [6:0] R15_segDisplay,
-    output wire [3:0] R15_anDisplay
+    output reg [3:0] R15_anDisplay
 );
 
     // Internal wires for connecting modules
@@ -76,18 +76,45 @@ module top (
         .aAddress(aAddress),
         .bAddress(bAddress),
         .aluOpCode(aluOpCode),
-        .R15_out(R15_value)
+        .R15_out(R15_value),
+        .haltCondition(halt)
     );
+
+    // Display control
+    reg [3:0] display_value;
+    reg [16:0] display_counter;
+    
+    // Initialize R15_anDisplay to 4'b1110 (rightmost display active)
+    initial begin
+        R15_anDisplay = 4'b1110;
+    end
+    
+    always @(posedge clk) begin
+        if (rst_debounced) begin
+            display_counter <= 0;
+            display_value <= 0;
+        end else begin
+            display_counter <= display_counter + 1;
+
+            if (display_counter[16]) begin
+                R15_anDisplay <= {R15_anDisplay[2:0], R15_anDisplay[3]};
+                display_counter <= 0;
+            end
+
+            case (R15_anDisplay)
+                4'b1110: display_value <= R15_value[3:0];      // Rightmost display: lower 4 bits of R15
+                4'b1101: display_value <= R15_value[7:4];      // Second from right: upper 4 bits of R15
+                4'b1011: display_value <= extInputDataSW[3:0]; // Third from right: lower 4 bits of switch input
+                4'b0111: display_value <= extInputDataSW[7:4]; // Leftmost display: upper 4 bits of switch input
+                default: display_value <= 4'b0000;             // Default case: display 0
+            endcase
+        end
+    end
 
     // 7-segment display decoder
-    // Can only display lower 4 bits of R15
-    // TODO: Expand to display hex up to 8 bits or use 2 7-segment displays to display two digit decimals
     bin_to_hex_7seg display_decoder(
-        .in(R15_value),
+        .in(display_value),
         .out(R15_segDisplay)
     );
-
-    // Display control (show only on rightmost digit)
-    assign R15_anDisplay = 4'b1110;  // Enable only rightmost digit
 
 endmodule
